@@ -14,6 +14,6 @@ namespace :deploy do
     svc "-d"
   end
   task :restart do
-    svc ""
+    svc "-t"
   end
 end
