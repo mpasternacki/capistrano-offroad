@@ -11,9 +11,12 @@ def django_manage(cmd, path="#{latest_release}")
 end
 
 namespace :django do
+  desc "Run manage.py syncdb in latest release."
   task :syncdb do
     django_manage "syncdb"
   end
+
+  desc "Run custom Django management command in latest release."
   task :manage do
     set_from_env_or_ask :command, "Enter management command"
     django_manage "#{command}"
