@@ -11,11 +11,6 @@ def django_manage(cmd, path="#{latest_release}")
 end
 
 namespace :django do
-  desc "Run manage.py syncdb in latest release."
-  task :syncdb do
-    django_manage "syncdb --noinput"
-  end
-
   desc "Run custom Django management command in latest release."
   task :manage do
     set_from_env_or_ask :command, "Enter management command"
@@ -23,7 +18,13 @@ namespace :django do
   end
 end
 
-after "deploy:update", "django:syncdb"
+namespace :deploy do
+  desc "Run manage.py syncdb in latest release."
+  task :migrate, :roles => :db, :only => { :primary => true } do
+    # FIXME: path, see default railsy deploy:migrate
+    django_manage "syncdb --noinput"
+  end
+end
 
 # depend :remote, :python_module, "module_name"
 # runs #{python} and tries to import module_name.
