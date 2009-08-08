@@ -13,7 +13,7 @@ end
 namespace :django do
   desc "Run manage.py syncdb in latest release."
   task :syncdb do
-    django_manage "syncdb"
+    django_manage "syncdb --noinput"
   end
 
   desc "Run custom Django management command in latest release."
