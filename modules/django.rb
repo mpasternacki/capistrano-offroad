@@ -3,6 +3,7 @@
 set :python, "python"
 
 set :django_project_subdirectory, "project"
+set :django_use_south, false
 
 depend :remote, :command, "#{python}"
 
@@ -23,6 +24,7 @@ namespace :deploy do
   task :migrate, :roles => :db, :only => { :primary => true } do
     # FIXME: path, see default railsy deploy:migrate
     django_manage "syncdb --noinput"
+    django_manage "migrate" if fetch(:django_use_south, false)
   end
 end
 
