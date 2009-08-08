@@ -24,3 +24,14 @@ namespace :django do
 end
 
 after "deploy:update", "django:syncdb"
+
+# depend :remote, :python_module, "module_name"
+# runs #{python} and tries to import module_name.
+class Capistrano::Deploy::RemoteDependency
+  def python_module(module_name, options={})
+    @message ||= "Cannot import `#{module_name}'"
+    python = configuration.fetch(:python, "python")
+    try("#{python} -c 'import #{module_name}'", options)
+    self
+  end
+end
