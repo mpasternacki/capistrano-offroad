@@ -7,7 +7,9 @@ set :django_use_south, false
 
 depend :remote, :command, "#{python}"
 
-def django_manage(cmd, path="#{latest_release}")
+def django_manage(cmd, options={})
+  puts options
+  path = options.delete(:path) or "#{latest_release}"
   run "cd #{path}/#{django_project_subdirectory}; #{python} manage.py #{cmd}"
 end
 
