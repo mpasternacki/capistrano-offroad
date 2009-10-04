@@ -39,4 +39,9 @@ namespace :deploy do
       sudo "#{monit_command} #{_monit_args} status"
     end
   end
+
+  desc "Reload monit"
+  task :reload_monit do
+    sudo "#{monit command} reload"
+  end
 end
