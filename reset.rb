@@ -5,7 +5,7 @@ set :shared_children, %w()
 namespace :deploy do
   task :finalize_update, :except => { :no_release => true } do
     if fetch(:group_writable, true)
-      sudo "chgrp -R #{group} #{latest_release}"
+      sudo "chgrp -R #{deploy_group} #{latest_release}"
       run "chmod -R g+w #{latest_release}"
     end
   end
