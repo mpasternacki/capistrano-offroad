@@ -9,7 +9,7 @@ depend :remote, :command, "#{python}"
 
 def django_manage(cmd, options={})
   path = options.delete(:path) || "#{latest_release}"
-  run "cd #{path}/#{django_project_subdirectory}; #{python} manage.py #{cmd}"
+  run "cd #{path}/#{django_project_subdirectory}; #{python} manage.py #{cmd}", options
 end
 
 namespace :django do
