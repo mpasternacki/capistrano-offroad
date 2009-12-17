@@ -3,6 +3,8 @@ set :supervisord_command, "supervisord"
 set :supervisorctl_command, "supervisorctl"
 set :supervisord_conf, "supervisord_conf"
 set :supervisord_pidfile, "supervisord.pid"
+set :supervisord_start_group, nil
+set :supervisord_stop_group, nil
 
 namespace :deploy do
   def supervisord_pidfile_path ; "#{shared_path}/#{supervisord_pidfile}" end
@@ -35,19 +37,33 @@ namespace :deploy do
     end
   end
 
+  def _target(var)
+    group_name = ENV['GROUP']
+    group_name ||= fetch var
+
+    if ['', nil].include? group_name then
+      "all"
+    else
+      "'#{group_name}:*'"
+    end
+  end
+
   desc "Start processes"
   task :start do
-    supervisorctl "start all", :try_start => true
+    to_start = _target(:supervisord_start_group)
+    supervisorctl "start #{to_start}", :try_start => true
   end
 
   desc "Stop processes"
   task :stop do
-    supervisorctl "stop all", :try_start => false
+    to_stop = _target(:supervisord_stop_group)
+    supervisorctl "stop #{to_stop}", :try_start => false
   end
 
   desc "Restart processes"
   task :restart do
-    supervisorctl "restart all"
+    to_restart = _target(:supervisord_start_group)
+    supervisorctl "restart #{to_restart}"
   end
 
   desc "Display status of processes"
