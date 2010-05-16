@@ -40,9 +40,11 @@ namespace :deploy do
   def _target(var)
     group_name = ENV['GROUP']
     group_name ||= fetch var
+    prog_name = ENV['PROGRAM']
+    prog_name ||= 'all'
 
     if ['', nil].include? group_name then
-      "all"
+      prog_name
     else
       "'#{group_name}:*'"
     end
