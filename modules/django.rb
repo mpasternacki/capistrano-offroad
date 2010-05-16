@@ -13,7 +13,12 @@ def django_manage(cmd, options={})
 end
 
 namespace :django do
-  desc "Run custom Django management command in latest release."
+  desc <<EOF
+Run custom Django management command in latest release.
+
+Pass the management command and arguments in COMMAND="..." variable.
+If COMMAND variable is not provided, Capistrano will ask for a command.
+EOF
   task :manage do
     set_from_env_or_ask :command, "Enter management command"
     django_manage "#{command}"
