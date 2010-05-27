@@ -17,6 +17,7 @@ end
 
 _load_relative 'reset.rb'
 _load_relative 'utils.rb'
+_load_relative 'version.rb'
 
 def offroad_modules(*modules)
   modules.each { |mod| _load_relative "modules/#{mod}.rb" }

@@ -1,3 +1,4 @@
+require 'capistrano-offroad/version'
 require 'capistrano-offroad/reset'
 require 'capistrano-offroad/utils'
 
