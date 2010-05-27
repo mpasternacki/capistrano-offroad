@@ -1,5 +1,7 @@
 # Small extensions to Capistrano
 
+require 'capistrano'
+
 # depend :remote, :run, "whole command with args"
 # runs command, if return code <> 0, dependency fails.
 class Capistrano::Deploy::RemoteDependency
