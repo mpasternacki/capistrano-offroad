@@ -33,8 +33,8 @@ EOF
     desc "Run manage.py syncdb in latest release."
     task :migrate, :roles => :db, :only => { :primary => true } do
       # FIXME: path, see default railsy deploy:migrate
-      django_manage "syncdb --noinput"
-      django_manage "migrate" if fetch(:django_use_south, false)
+      m = if fetch(:django_use_south, false) then "--migrate" else "" end
+      django_manage "syncdb --noinput #{m}"
     end
   end
 
