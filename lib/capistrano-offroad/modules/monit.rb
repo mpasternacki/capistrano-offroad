@@ -1,7 +1,7 @@
 require 'capistrano'
 
 Capistrano::Configuration.instance(:must_exist).load do
-  set :monit_group, nil
+  set :monit_group, nil         # process group to start/stop/reload
   set :monit_command, "monit"
 
   def _monit_args()
