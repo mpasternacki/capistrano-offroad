@@ -13,9 +13,12 @@ Gem::Specification.new do |s|
   s.version = CapistranoOffroad::VERSION::STRING
   s.summary = "Capistrano add-ons and recipes for non-rails projects"
   s.description = "Capistrano add-ons and recipes for non-rails projects" # FIXME
+
   s.authors = ["Maciej Pasternacki"]
   s.email = "maciej@pasternacki.net"
   s.homepage = "http://github.com/mpasternacki/capistrano-offroad"
+
+  s.add_dependency "capistrano", ">= 2.5.8"
 
   s.required_rubygems_version = ">= 1.3.6"
   s.files = Dir.glob("lib/**/*.rb") + %w(README LICENSE)
