@@ -16,13 +16,13 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc "[internal] Remove symlink from svscan directory"
-    task :remove_symlink do
+    task :do_remove_symlink do
       sudo "rm -v #{svscan_root}/#{supervise_name}"
     end
 
     desc "Remove symlink from svscan directory and stop supervise"
-    task :remove do
-      remove_symlink
+    task :remove_symlink do
+      do_remove_symlink
       sudo "svc -x -t #{current_path}"
     end
 
