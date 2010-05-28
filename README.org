@@ -1,0 +1,279 @@
+#+TITLE:     Capistrano-offroad
+#+AUTHOR:    Maciej Pasternacki
+#+EMAIL:     maciej@pasternacki.net
+#+DATE:      2010-05-28 Fri
+#+DESCRIPTION: Capistrano add-ons and recipes for non-rails projects
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   http://github.com/mpasternacki/capistrano-offroad/
+#+LINK_HOME: http://github.com/mpasternacki/capistrano-offroad/
+
+Capistrano-offroad is a support package for using Capistrano with
+non-rails projects.  It contains basic reset of Rails-specific tasks,
+a handful of utility functions, and modules with recipes.
+
+Capistrano-offroad is available on terms of BSD license.  See LICENSE
+file for details.
+
+* Installation
+
+** System-wide installation
+
+   Capistrano-offroad is available as a Ruby Gem, so in most cases you
+   should simply call:
+
+   : gem install capistrano-offroad
+
+   This requires fairly recent version of Ruby gems (1.3.6 or later),
+   so it's possible you'll need to upgrade rubygems itself:
+
+   : gem update --system
+
+   You can also download source code directly from Github page
+   http://github.com/mpasternacki/capistrano-offroad and install it by
+   rebuilding the gem manually.
+
+** Project-local installation
+
+   You can download source code from Github and use it as a Git
+   submodule, or just drop it into your code base in whatever way
+   suits you.  Then, you should add to you Capfile the magic line
+   adding capistrano-offroad's =lib/= subdirectory to the require
+   path.
+
+   : $:.unshift File.join( File.dirname(__FILE__), 'relative/path/to/capistrano-offroad/lib' )
+
+* Usage
+
+  When you've got capistrano-offroad on your require path, whether
+  globally from a gem, or by extending require path, you simply
+  =require= it.
+
+  : require 'capistrano-offroad'
+
+  For some reason, this line should appear *after* the
+  =set :application= declaration.
+
+  After that, you either =require= desired modules yourself, or use
+  =offroad_modules= helper function.
+
+  : require 'capistrano-offroad/modules/defaults'
+  : require 'capistrano-offroad/modules/django'
+
+  : offroad_modules 'defaults', 'django'
+
+* Features
+** Reset
+   By default, capistrano-offroad empties Rails-specific tasks:
+   =deploy:migrate=, =deploy:start=, =deploy:stop=, =deploy:restart=.
+
+   The =:deploy:finalize_update= task is cut down to only run =chgrp=
+   and =chmod= when =:group_writable= setting is true.  =chgrp=
+   behaviour can be modified by setting =:group_writable= to:
+   - =:no_chgrp= - don't run =chgrp= command
+   - =:sudo_chgrp= - use =sudo= to make sure =chgrp= has proper permissions
+
+   The setting =:shared_children= is set to an empty list.  This gives
+   comfortable enough blank slate for working on non-rails projects,
+   without redefining all the workflow that is already present in
+   Capistrano.
+** Utilities
+   By default, two extensions to Capistrano are defined.
+*** =:run= dependency type
+    Usage:
+    : depend :remote, :run, "full shell command"=
+
+    When running =cap deploy:check=, run the supplied shell command.
+    If its exit status is non-zero, the dependency has failed.
+*** =set_from_env_or_ask=
+    Usage:
+    : set_from_env_or_ask :setting_name, "Query prompt: "
+
+    If there is =SETTING_NAME= (uppercased first argument) in
+    environment (i.e. supplied from command line), set =:setting_name=
+    to value of this environment variable.
+
+    If the environment variable is not defined, ask user interactively
+    for a value, using query prompt supplied as a second argument.
+*** =offroad_modules=
+    Loads capistrano-offroad modules named as arguments.  Convenience
+    function, so that user doesn't have to type =require= lines by himself.
+** Version
+   Three constants defining version of capistrano-offroad are defined:
+
+   : CapistranoOffroad::VERSION::MAJOR
+   : CapistranoOffroad::VERSION::MINOR
+   : CapistranoOffroad::VERSION::TINY
+
+   Convenience string constant with full version number, separated
+   with dots, is provided:
+
+   : CapistranoOffroad::VERSION::STRING
+*** =require_version=
+    A helper function, which can be used in Capfile to enforce a minimum
+    version of capistrano-offroad:
+
+    : CapistranoOffroad::VERSION.require_version(major, minor=0, tiny=0)
+** Modules
+   Modules are packs of recipes and helpers for dealing with specific
+   software.
+
+   To load a module, either use the =require= function:
+
+   : require 'capistrano-offroad/modules/module-name'
+
+   or use supplied =offroad_modules= helper function:
+
+   : offroad_modules "foo", "bar", "baz", ...
+
+   When using a module, it is advised to at least browse through its
+   source to know what to expect.
+
+   Following modules are defined:
+
+*** defaults
+
+    Contains my personal defaults for settings.  For me it's part of
+    reset, but I moved it out to a separate module, because other
+    users may have different opinions.  The settings are:
+
+    : set :scm, :git
+    : set :ssh_options, { :forward_agent => true }
+    : set :use_sudo, false
+    : set :deploy_to, "/srv/#{application}"
+
+*** django
+    Settings, utilities and recipes for deploying [[http://djangoproject.org/][Django]] projects.
+**** Settings
+     Following settings are defined.
+***** :python
+      Python interpreter command.  Defaults to "python".
+
+      Module also adds a dependency on this command to =deploy:check=.
+***** :django_project_subdirectory
+      Directory in your repository that contains Django project (one
+      with the the =manage.py= file).  Defaults to "project".
+***** :django_use_south
+      Assume [[http://south.aeracode.org/][South]] is used for database migrations.  Defaults to true.
+**** Functions and utilities
+     : django_manage cmd, options={}
+     Runs the =manage.py= command =cmd=.  Optional keyword argument
+     =:path= provides path to a Capistrano release where the command
+     should be run.  It defaults to =:latest_release=.
+
+     =:python_module= dependency type is defined to name Python
+     modules in =deploy:check= dependencies:
+
+     : depend :remote, :python_module, "MySQLdb"
+**** Tasks
+***** django:manage
+      Run custom Django management command in latest release.
+
+      Pass the management command and arguments in COMMAND="..."
+      variable.  If COMMAND variable is not provided, Capistrano will
+      ask for a command.
+
+***** deploy:migrate
+      Runs =manage.py syncdb= in the latest release.  If
+      =:django_use_south= is true, it =--migrate= switch is used.
+****** TODO make it run in specified release, as vanilla Rails =deploy:migrate=
+***** TODO separate =python= module
+      Stuff that is not Django-specific should be moved to a separate
+      =python= module that could be used with Python-related
+      non-Django projects.  The =python= module would be automatically
+      loaded by =django= module.
+
+*** supervisord
+    Control processes with [[http://supervisord.org/][the supervisor daemon]].
+
+**** Settings
+     : set :supervisord_path, ""     # directory where supervisord binaries reside
+     : set :supervisord_command, "supervisord"
+     : set :supervisorctl_command, "supervisorctl"
+     : set :supervisord_conf, "supervisord_conf"
+     : set :supervisord_pidfile, "supervisord.pid"
+     : set :supervisord_start_group, nil # process group to start on deploy:start - nil means all processes
+     : set :supervisord_stop_group, nil  # process group to stop on deploy:stop - nil means all processes
+
+**** Utilities
+     : supervisorctl(cmd, options={})
+     Run a =supervisorctl= command specified as first argument.  If
+     optional keyword argument =:try_start= is true (the default, you
+     may specify as false), start =supervisord= if not already
+     running.
+
+**** Tasks
+***** Standard tasks
+      Stock Capistrano tasks =deploy:start=, =deploy:stop=,
+      =deploy:restart= are defined.  They optionally accept =GROUP= or
+      =PROGRAM= environment variables, which can specify a single,
+      specific process group or a single process name to start, stop
+      or restart.
+***** deploy:status
+      Runs =supervisorctl status=.
+***** deploy:processes
+      Runs =pstree= with root in supervisord if supervisord is
+      running.
+***** deploy:reload_supervisord
+      Reloads supervisor daemon's config.  Starts it if not started.
+***** deploy:supervisorctl
+      Runs supplied supervisorctl command.  Command should be provided
+      in COMMAND variable; if no variable is provided,
+      capistrano-offroad will ask for the command.
+
+*** daemontools
+    Recipes and settings for controlling processes with Dan
+    Bernstein's [[http://cr.yp.to/daemontools.html][daemontools]].  It expects that =run= script lives in
+    top level of your repository.
+
+    *WARNING*: this is legacy code, used only in old projects and not
+    very well supported.
+
+    Also, this is probably not the best way to deal with the problem -
+    it would be easier to manage, start and restart with the =run=
+    script in the =:deploy_to= root, which would =cd= to =current= and
+    =exec ./run=.  If anybody wants to write a patch to support that,
+    it would be great :)
+**** Settings
+     : set :svscan_root, "/service"
+     : set :supervise_name, "#{application}"
+**** Utilities
+     =svc= function runs =svc= with supplied arguments for the
+     supervised directory.
+**** Tasks
+     - =daemontools:create_symlink= - creates a symlink in =:svscan_root=
+     - =daemontools:remove_symlink= - removes symlink from
+       =:svscan_root= and stops the app
+     - =daemontools:status= - displays =svstat= output for current release
+     - =daemontools:relstatus= - displays =svstat= output for all
+       releases (use it after restart to make sure that previous
+       release has actually stopped)
+     - =deploy:start=, =deploy:stop=, =deploy:restart= - standard
+       Capistrano tasks
+     - =deploy:symlink= internal target is redefined; =on_rollback=
+       handler is currently broken
+
+*** monit
+    Module to run processes with monit.
+    *This is legacy, unsupported, unused code*. Use it (and monit) on
+    your own risk.  I'm leaving it in only because the code is already
+    written and it would be waste to throw it away only because monit
+    sucks.
+**** Settings
+     : set :monit_group, nil         # process group to start/stop/reload
+     : set :monit_command, "monit"
+
+**** Tasks
+     - =deploy:start=, =deploy:stop=, =deploy:restart= - standard
+       Capistrano tasks.  They accept an extra optional variable
+       PROCESS which, if given, specifies a single process to start,
+       stop or restart.  If PROCESS is not given, all processes (of
+       =:monit_group= group, if configured) are started/stopped/restarted.
+     - =deploy:status= - displays =monit summary= output
+     - =deploy:status:full= - displays =monit status= output
+     - =deploy:reload_monit= - reloads monit configuration
