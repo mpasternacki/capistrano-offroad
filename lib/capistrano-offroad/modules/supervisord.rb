@@ -1,13 +1,13 @@
 require 'capistrano'
 
 Capistrano::Configuration.instance(:must_exist).load do
-  set :supervisord_path, ""
+  set :supervisord_path, ""     # directory where supervisord binaries reside
   set :supervisord_command, "supervisord"
   set :supervisorctl_command, "supervisorctl"
   set :supervisord_conf, "supervisord_conf"
   set :supervisord_pidfile, "supervisord.pid"
-  set :supervisord_start_group, nil
-  set :supervisord_stop_group, nil
+  set :supervisord_start_group, nil # process group to start on deploy:start - nil means all processes
+  set :supervisord_stop_group, nil  # process group to stop on deploy:stop - nil means all processes
 
   namespace :deploy do
     def supervisord_pidfile_path ; "#{shared_path}/#{supervisord_pidfile}" end
@@ -86,7 +86,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       supervisorctl "reload"
     end
 
-    task :run_supervisorctl do
+    task :supervisorctl do
       set_from_env_or_ask :command, "supervisorctl command: "
       supervisorctl "#{command}", :try_start => false
     end
