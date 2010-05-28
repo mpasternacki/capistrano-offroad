@@ -12,11 +12,16 @@ Gem::Specification.new do |s|
   s.name = "capistrano-offroad"
   s.version = CapistranoOffroad::VERSION::STRING
   s.summary = "Capistrano add-ons and recipes for non-rails projects"
-  s.description = "Capistrano add-ons and recipes for non-rails projects" # FIXME
+  s.description = <<EOF
+Capistrano-offroad is a support package for using Capistrano with
+non-rails projects.  It contains basic reset of Rails-specific tasks,
+a handful of utility functions, and modules with recipes.
+EOF
 
   s.authors = ["Maciej Pasternacki"]
   s.email = "maciej@pasternacki.net"
   s.homepage = "http://github.com/mpasternacki/capistrano-offroad"
+  s.licenses = ['BSD']
 
   s.add_dependency "capistrano", ">= 2.5.8"
 
