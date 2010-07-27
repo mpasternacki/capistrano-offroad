@@ -199,10 +199,15 @@ Table of Contents
     Directory in your repository that contains Django project (one
     with the the `manage.py' file).  Defaults to "project".
   + :django_use_south 
-    Assume [South] is used for database migrations.  Defaults to true.
+    Assume [South] is used for database migrations.  Defaults to false.
 
     [South]: http://south.aeracode.org/
 
+  + :django_databases 
+    This setting can be set to a list of database names (for
+    Django-1.2 multi-database support), against which Capistrano
+    will run syncdb/migrations. If unset or false, syncdb/migrations
+    will be run with default database only (as for pre-1.2 Django).
 * Functions and utilities 
   django_manage cmd, options={}
   Runs the `manage.py' command `cmd'.  Optional keyword argument

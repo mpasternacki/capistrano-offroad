@@ -8,6 +8,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :django_project_subdirectory, "project"
   set :django_use_south, false
+  set :django_databases, nil
 
   depend :remote, :command, "#{python}"
 
@@ -34,7 +35,13 @@ EOF
     task :migrate, :roles => :db, :only => { :primary => true } do
       # FIXME: path, see default railsy deploy:migrate
       m = if fetch(:django_use_south, false) then "--migrate" else "" end
-      django_manage "syncdb --noinput #{m}"
+      if fetch(:django_databases, nil)
+        fetch(:django_databases, nil).each { |db|
+          django_manage "syncdb --noinput #{m} --database=#{db}"
+        }
+      else
+        django_manage "syncdb --noinput #{m}"
+      end
     end
   end
 
