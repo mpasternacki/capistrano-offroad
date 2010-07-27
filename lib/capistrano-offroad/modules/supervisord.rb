@@ -86,7 +86,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       supervisorctl "reload"
     end
 
-    task :supervisorctl do
+    task :run_supervisorctl do
       set_from_env_or_ask :command, "supervisorctl command: "
       supervisorctl "#{command}", :try_start => false
     end

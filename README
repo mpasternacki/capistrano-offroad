@@ -269,7 +269,7 @@ Table of Contents
     running.
   + deploy:reload_supervisord 
     Reloads supervisor daemon's config.  Starts it if not started.
-  + deploy:supervisorctl 
+  + deploy:run_supervisorctl 
     Runs supplied supervisorctl command.  Command should be provided
     in COMMAND variable; if no variable is provided,
     capistrano-offroad will ask for the command.
