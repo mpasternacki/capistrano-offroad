@@ -24,7 +24,7 @@ class Capistrano::Configuration
     end
   end
 
-  def warn(short, long=nil)
+  def delayed_warning(short, long=nil)
     @_offroad_util_warnings ||= []
     @_offroad_util_warnings.push short
     puts <<EOF
