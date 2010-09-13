@@ -23,4 +23,45 @@ class Capistrano::Configuration
       set sym do Capistrano::CLI.ui.ask question end
     end
   end
+
+  def warn(short, long=nil)
+    @_offroad_util_warnings ||= []
+    @_offroad_util_warnings.push short
+    puts <<EOF
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                           BIG FAT WARNING:
+EOF
+    puts short
+    puts long if long
+puts <<EOF
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+EOF
+  end
+
+  def _offroad_emit_warnings()
+    if @_offroad_util_warnings
+      puts <<-"EOF"
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                         #{@_offroad_util_warnings.length} WARNING(S) LOGGED
+        READ VERY CAREFULLY, FOR I SHALL WRITE THIS ONLY ONCE
+                        SCROLL UP FOR DETAILS
+
+EOF
+        @_offroad_util_warnings.each { |w| puts " - #{w}" }
+        puts <<EOF
+
+                         YOU HAVE BEEN WARNED
+EOF
+    end
+  end
+end
+
+Capistrano::Configuration.instance(:must_exist).load do
+  on :exit do
+    _offroad_emit_warnings
+  end
 end
