@@ -2,7 +2,7 @@ module CapistranoOffroad
   module VERSION
     MAJOR = 0
     MINOR = 1
-    TINY  = 2
+    TINY  = 3
     STRING = [MAJOR, MINOR, TINY].join('.')
 
     def VERSION.require_version(major, minor=0, tiny=0)

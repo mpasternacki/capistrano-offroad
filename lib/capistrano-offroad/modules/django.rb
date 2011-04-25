@@ -14,7 +14,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   def django_manage(cmd, options={})
     path = options.delete(:path) || "#{latest_release}"
-    run "cd #{path}/#{django_project_subdirectory}; #{python} manage.py #{cmd}", options
+    manage_py = fetch(:django_manage_py, "#{python} manage.py")
+    run "cd #{path}/#{django_project_subdirectory}; #{manage_py} #{cmd}", options
   end
 
   namespace :django do
